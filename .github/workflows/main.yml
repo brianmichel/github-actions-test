@@ -16,8 +16,13 @@ jobs:
         run: |
           echo "I'm value ${{ matrix.value }}"
       - name: Set output
+        id: output
         run: |
          echo "return-value-${{ matrix.value }}=${{ matrix.value }}" >> $GITHUB_OUTPUT
+    outputs:
+      return-value-a: ${{ steps.output.outputs.return-value-a }}
+      return-value-b: ${{ steps.output.outputs.return-value-b }}
+      return-value-c: ${{ steps.output.outputs.return-value-c }}
 
   read_values:
     needs: [create_values]
@@ -25,10 +30,12 @@ jobs:
     strategy:
       matrix:
         value: ['a', 'b', 'c']
+    env:
+      output_value: ${{ matrix.value }}
     steps:
       - name: Print ${{ matrix.value }} values
         shell: bash
         run: |
           printenv
-          echo "outputs: ${{ needs.create_values.outputs.return-value-a }}"
+          echo "outputs: ${{ needs.create_values.outputs[env.outputs] }}"
 
