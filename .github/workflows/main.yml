@@ -1,0 +1,33 @@
+name: "main"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_values:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        value: ['a', 'b', 'c']
+    steps:
+      - name: Print ${{ matrix.value }}
+        shell: bash
+        run: |
+          echo "I'm value ${{ matrix.value }}"
+    outputs:
+      return-value: ${{ matrix.value }}
+
+  read_values:
+    needs: [create_values]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        value: ['a', 'b', 'c']
+    steps:
+      - name: Print ${{ matrix.value }} values
+        shell: bash
+        run: |
+          printenv
+          echo "outputs: ${{ needs.create_values.outputs }}"
+
