@@ -29,5 +29,5 @@ jobs:
         shell: bash
         run: |
           printenv
-          echo "outputs: ${{ toJson(needs.create_values.outputs) }}"
+          echo "outputs: ${{ join(needs.create_values.outputs.*, '\n') }}"
 
