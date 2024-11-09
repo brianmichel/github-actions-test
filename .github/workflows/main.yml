@@ -37,5 +37,5 @@ jobs:
         shell: bash
         run: |
           printenv
-          echo "outputs: ${{ needs.create_values.outputs[env.output_value] }}"
+          echo "outputs: ${{ needs.create_values.outputs.* }}"
 
