@@ -34,6 +34,17 @@ jobs:
     outputs:
       result: "${{ steps.read.outputs.result }}"
 
+  assert_matrix:
+    runs-on: ubuntu-latest
+    needs: [read]
+    strategy:
+      matrix: ${{ fromJson(needs.read.outputs.result) }}
+    steps:
+      - name: "Echo"
+        run: |-
+          echo "Thing ${{ matrix.matrix_value }}"
+          echo "Other ${{ matrix.other_thing }}"
+
   assert:
     runs-on: ubuntu-latest
     needs: [read]
