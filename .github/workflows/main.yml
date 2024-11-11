@@ -35,7 +35,7 @@ jobs:
         id: serialize
         run: |-
           set -eux
-          DATA=$(echo '${{ toJson(steps.read.outputs.result)}}' | jq -rc '[ to_entries[] | { key: .key, value: .value | to_entries[] } | { key: .value.key, value: { (.key): .value.value } }] | reduce .[] as $item ( {}; . + { ($item.key): ( (.[($item.key)] // {}) + $item.value)}) | [.[]] | .')
+          DATA=$(echo '${{ toJson(steps.read.outputs.result)}}' | jq -rc 'fromjson | [ to_entries[] | { key: .key, value: .value | to_entries[] } | { key: .value.key, value: { (.key): .value.value } }] | reduce .[] as $item ( {}; . + { ($item.key): ( (.[($item.key)] // {}) + $item.value)}) | [.[]] | .')
           echo "result=$DATA" >> "$GITHUB_OUTPUT"
     outputs:
       result: ${{ steps.serialize.outputs.result }}
