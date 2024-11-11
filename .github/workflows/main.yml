@@ -15,27 +15,43 @@ jobs:
         shell: bash
         run: |
           echo "I'm value ${{ matrix.value }}"
-      - name: Set output
-        id: output
-        run: |
-         echo "return-value-${{ matrix.value }}=${{ matrix.value }}" >> $GITHUB_OUTPUT
-    outputs:
-      return-value-a: ${{ steps.output.outputs.return-value-a }}
-      return-value-b: ${{ steps.output.outputs.return-value-b }}
-      return-value-c: ${{ steps.output.outputs.return-value-c }}
-
-  read_values:
-    needs: [create_values]
+      - uses: cloudposse/github-action-matrix-outputs-write@v1
+        id: out
+        with:
+          matrix-step-name: ${{ github.job }}
+          matrix-key: ${{ matrix.value }}
+          outputs: |-
+            matrix_value: ${{ matrix.value }}
+  read:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        value: ['a', 'b', 'c']
-    env:
-      output_value: ${{ matrix.value }}
+    needs: [create_values]
     steps:
-      - name: Print ${{ matrix.value }} values
-        shell: bash
-        run: |
-          printenv
-          echo "outputs: ${{ needs.create_values.outputs.*[0] }}"
+      - uses: cloudposse/github-action-matrix-outputs-read@v1
+        id: read
+        with:
+          matrix-step-name: create_values
+    outputs:
+      result: "${{ steps.read.outputs.result }}"
+
+  assert:
+    runs-on: ubuntu-latest
+    needs: [read]
+    steps:
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: a
+          ## This how you can reference matrix output
+          actual: ${{ fromJson(needs.read.outputs.result).matrix_value.a }}
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: b
+          ## This how you can reference matrix output
+          actual: ${{ fromJson(needs.read.outputs.result).matrix_value.b }}
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: b
+          ## This how you can reference matrix output
+          actual: ${{ fromJson(needs.read.outputs.result).matrix_value.b }}
 
