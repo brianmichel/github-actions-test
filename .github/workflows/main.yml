@@ -52,6 +52,8 @@ jobs:
         run: |-
           echo ${{ needs.read.outputs.result }}
           echo "fromJSON: ${{ fromJson(needs.read.outputs.result) }}"
+          echo ${{ matrix.include }}
+          echo "matrix fromJSON ${{ fromJson(matrix.include) }}"
       - name: "Echo"
         run: |-
           echo "stuff ${{ matrix.include }}"
