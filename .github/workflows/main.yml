@@ -41,7 +41,7 @@ jobs:
       result: ${{ steps.serialize.outputs.result }}
 
   assert_matrix:
-    name: "Assert ${{ matrix.include.matrix_value.a }}"
+    name: "Assert ${{ matrix.include.a }}"
     runs-on: ubuntu-latest
     needs: [read]
     strategy:
