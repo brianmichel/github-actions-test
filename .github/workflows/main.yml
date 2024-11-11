@@ -41,13 +41,17 @@ jobs:
       result: ${{ steps.serialize.outputs.result }}
 
   assert_matrix:
-    name: "Assert ${{ matrix.include.matrix_value }}"
+    name: "Assert ${{ matrix.include.matrix_value.a }}"
     runs-on: ubuntu-latest
     needs: [read]
     strategy:
       matrix:
         include: ${{ fromJson(needs.read.outputs.result) }}
     steps:
+      - name: "Dump Info"
+        run: |-
+          echo ${{ needs.read.outputs.result }}
+          echo "fromJSON: ${{ fromJson(needs.read.outputs.result) }}"
       - name: "Echo"
         run: |-
           echo "stuff ${{ matrix.include }}"
