@@ -50,5 +50,5 @@ jobs:
     steps:
       - name: "Echo"
         run: |-
-          echo "stuff ${{ fromJson(matrix.include) }}"
+          echo "stuff ${{ matrix.include }}"
 
