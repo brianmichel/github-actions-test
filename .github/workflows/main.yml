@@ -36,7 +36,7 @@ jobs:
         run: |-
           set -eux
           printf '%s\n' "${{ toJson(steps.read.outputs.result) }}" > output.json
-          DATA=$(cat otuput.json | jq -r '.[]')
+          DATA=$(cat output.json | jq -r '.[]')
           echo "result=$DATA" >> "$GITHUB_OUTPUT"
 
   assert_matrix:
