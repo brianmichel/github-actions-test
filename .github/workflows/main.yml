@@ -35,7 +35,8 @@ jobs:
         id: serialize
         run: |-
           set -eux
-          DATA=$(echo ${{ toJson(steps.read.outputs.result) }} | jq -r '.[]')
+          printf '%s\n' "${{ toJson(steps.read.outputs.result) }}" > output.json
+          DATA=$(cat otuput.json | jq -r '.[]')
           echo "result=$DATA" >> "$GITHUB_OUTPUT"
 
   assert_matrix:
