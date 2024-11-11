@@ -37,16 +37,19 @@ jobs:
           set -eux
           DATA=$(echo '${{ toJson(steps.read.outputs.result)}}' | jq -rc 'fromjson | [.[]] | .')
           echo "result=$DATA" >> "$GITHUB_OUTPUT"
+    outputs:
+      result: ${{ steps.serialize.outputs.result }}
 
   assert_matrix:
-    name: "Assert ${{ matrix.matrix_value }}"
+    name: "Assert ${{ matrix.include.matrix_value }}"
     runs-on: ubuntu-latest
     needs: [read]
     strategy:
-      matrix: ${{ fromJson(needs.read.outputs.result) }}
+      matrix:
+        include: ${{ fromJson(needs.read.outputs.result) }}
     steps:
       - name: "Echo"
         run: |-
-          echo "Thing ${{ matrix.matrix_value }}"
-          echo "Other ${{ matrix.other_thing }}"
+          echo "Thing ${{ matrix.include.matrix_value }}"
+          echo "Other ${{ matrix.include.other_thing }}"
 
