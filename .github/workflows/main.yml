@@ -48,11 +48,11 @@ jobs:
         with:
           expected: b
           ## This how you can reference matrix output
-          actual: ${{ fromJson(needs.read.outputs.result).matrix_value }}
+          actual: ${{ fromJson(needs.read.outputs.result).matrix_value.b }}
 
       - uses: nick-fields/assert-action@v1
         with:
-          expected: b
+          expected: c
           ## This how you can reference matrix output
-          actual: ${{ fromJson(needs.read.outputs.result).matrix_value.b }}
+          actual: ${{ fromJson(needs.read.outputs.result).matrix_value.c }}
 
