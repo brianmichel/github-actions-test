@@ -1,12 +1,28 @@
-name: "main"
+name: "pull request"
 on:
-  push:
+  pull_request:
+    types: [opened, reopened, synchronize]
     branches:
       - main
 
 jobs:
+  optimize_ci:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.skip.outputs.skip }}
+    steps:
+      - name: "PR Check"
+        id: skip
+        # Run the optimizer if we're opened, reopened, synchronized, or if our
+        # base branch has changed. This will try to ensure that we don't let
+        # untested code in.
+        run: |
+          echo "github context\n ${{ toJson(github) }}"
+          echo "skip=${{ github.base_ref != 'main' }}" >> $GITHUB_OUTPUT
   create_values:
     runs-on: ubuntu-latest
+    needs: [optimize_ci]
+    if: needs.optimize_ci.outputs.skip == 'false'
     strategy:
       matrix:
         value: ['a', 'b', 'c']
@@ -59,3 +75,19 @@ jobs:
           echo "stuff ${{ matrix.configuration.matrix_value }}"
           echo "other ${{ matrix.configuration.other_thing }}"
 
+  build_and_test:
+    name: "Build & test"
+    runs-on: ubuntu-latest
+    needs: [assert_matrix]
+    if: always()
+    steps:
+      - name: "Return Workflow Completion Status Failure"
+        id: workflow-completed-failure
+        if: needs.assert_matrix.result != 'success'
+        run: |
+          exit 1
+      - name: "Return Workflow Completion Status Success"
+        id: workflow-completed-success
+        if: needs.assert_matrix.result == 'success'
+        run: |
+          exit 0

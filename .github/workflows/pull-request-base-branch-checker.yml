@@ -1,0 +1,23 @@
+name: Rerun PR Checks on Base Change
+
+on:
+  pull_request:
+    types: [edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  rerun-checks:
+    runs-on: ubuntu-latest
+    if: github.event.changes.base.ref != ''  # Only run if base branch was changed
+
+    steps:
+      - name: Trigger synchronize event
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api \
+            --method PUT \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/update-branch
