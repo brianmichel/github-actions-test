@@ -24,11 +24,11 @@ jobs:
 
         run: |
           echo "github context\n ${{ toJson(github) }}"
-          echo "skip=${{ github.base_ref != 'main' }}"
+          echo "skip=${{ github.base_ref != 'main' }}" >> $GITHUB_OUTPUT
   create_values:
     runs-on: ubuntu-latest
     needs: [optimize_ci]
-    if: ${{ needs.optimize_ci.outputs.skip == 'false' }}
+    if: needs.optimize_ci.outputs.skip == 'false'
     strategy:
       matrix:
         value: ['a', 'b', 'c']
