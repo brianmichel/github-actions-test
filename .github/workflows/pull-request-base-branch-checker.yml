@@ -19,10 +19,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get all workflow runs for this PR
+          # Get all workflow runs for this PR except this workflow
           runs=$(gh api \
             repos/${{ github.repository }}/actions/runs \
-            --jq '.workflow_runs[] | select(.pull_requests[].number == ${{ github.event.pull_request.number }}) | .id')
+            --jq '.workflow_runs[] | select(.pull_requests[].number == ${{ github.event.pull_request.number }} and .name != "Rerun PR Checks on Base Change") | .id')
 
           # Rerun each workflow
           echo "$runs" | while read run_id; do
