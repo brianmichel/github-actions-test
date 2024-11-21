@@ -19,10 +19,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get the latest pull_request workflow run for this PR
+          # Get the latest pull_request workflow run for this PR, excluding this workflow
           run_id=$(gh api \
             repos/${{ github.repository }}/actions/runs \
-            --jq '.workflow_runs[] | select(.event == "pull_request" and .head_sha == "${{ github.event.pull_request.head.sha }}") | .id' \
+            --jq '.workflow_runs[] | select(.event == "pull_request" and .head_sha == "${{ github.event.pull_request.head.sha }}" and .name != "Rerun PR Checks on Base Change") | .id' \
             | head -n1)
 
           if [ ! -z "$run_id" ]; then
