@@ -87,7 +87,13 @@ jobs:
     needs: [assert_matrix]
     if: always()
     steps:
-      - name: "Return Workflow Completion Status"
-        id: workflow-completed
+      - name: "Return Workflow Completion Status Failure"
+        id: workflow-completed-failure
+        if: needs.assert_matrix.result != 'success'
         run: |
-          exit ${{ needs.assert_matrix.result != 'success' }}
+          exit 1
+      - name: "Return Workflow Completion Status Success"
+        id: workflow-completed-success
+        if: needs.assert_matrix.result == 'success'
+        run: |
+          exit 0
