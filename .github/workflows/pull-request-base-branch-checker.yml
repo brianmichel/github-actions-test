@@ -5,9 +5,7 @@ on:
     types: [edited]
 
 permissions:
-  checks: write
   pull-requests: write
-  actions: write   # Needed for rerunning workflows
 
 jobs:
   rerun-checks:
@@ -15,21 +13,10 @@ jobs:
     if: github.event.changes.base.ref != ''  # Only run if base branch was changed
 
     steps:
-      - name: Rerun pull_request workflow
+      - name: Trigger synchronize event
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get the latest pull_request workflow run for this PR, excluding this workflow
-          run_id=$(gh api \
-            repos/${{ github.repository }}/actions/runs \
-            --jq '.workflow_runs[] | select(.event == "pull_request" and .head_sha == "${{ github.event.pull_request.head.sha }}" and .name != "Rerun PR Checks on Base Change") | .id' \
-            | head -n1)
-
-          if [ ! -z "$run_id" ]; then
-            echo "Rerunning workflow run $run_id"
-            gh api \
-              --method POST \
-              repos/${{ github.repository }}/actions/runs/$run_id/rerun
-          else
-            echo "No pull_request workflow run found to rerun"
-          fi
+          gh api \
+            --method PUT \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/update-branch
