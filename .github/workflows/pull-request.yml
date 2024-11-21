@@ -85,8 +85,9 @@ jobs:
     name: "Build & test"
     runs-on: ubuntu-latest
     needs: [assert_matrix]
+    if: always()
     steps:
       - name: "Return Workflow Completion Status"
         id: workflow-completed
         run: |
-          exit 0
+          exit ${{ needs.assert_matrix.result != 'success' }}
