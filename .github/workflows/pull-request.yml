@@ -1,10 +1,16 @@
-name: "main"
+name: "pull request"
 on:
-  push:
+  pull_request:
     branches:
       - main
 
 jobs:
+  should_run_again:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "PR Check"
+        run: |
+          echo "github context\n ${{ toJson(github) }}"
   create_values:
     runs-on: ubuntu-latest
     strategy:
