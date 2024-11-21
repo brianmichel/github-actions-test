@@ -8,8 +8,11 @@ on:
 jobs:
   optimize_ci:
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.skip.outputs.skip }}
     steps:
       - name: "PR Check"
+        id: skip
         # Run the optimizer if we're opened, reopened, synchronized, or if our
         # base branch has changed. This will try to ensure that we don't let
         # untested code in.
@@ -18,11 +21,14 @@ jobs:
           github.event.action == 'opened' ||
           github.event.action == 'reopened' ||
           github.event.action == 'synchronize'
+
         run: |
           echo "github context\n ${{ toJson(github) }}"
+          echo "skip=${{ github.base_ref != 'main' }}"
   create_values:
     runs-on: ubuntu-latest
     needs: [optimize_ci]
+    if: needs.optimize_ci.outputs.skip == 'false'
     strategy:
       matrix:
         value: ['a', 'b', 'c']
@@ -41,7 +47,7 @@ jobs:
             other_thing: ${{ join(matrix.value, 'lol') }}
   read:
     runs-on: ubuntu-latest
-    needs: [create_values, optimize_ci]
+    needs: [create_values]
     steps:
       - uses: cloudposse/github-action-matrix-outputs-read@v1
         id: read
