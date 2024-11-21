@@ -15,19 +15,21 @@ jobs:
     if: github.event.changes.base.ref != ''  # Only run if base branch was changed
 
     steps:
-      - name: Rerun all workflows
+      - name: Rerun pull_request workflow
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get all workflow runs for this PR except this workflow
-          runs=$(gh api \
+          # Get the latest pull_request workflow run for this PR
+          run_id=$(gh api \
             repos/${{ github.repository }}/actions/runs \
-            --jq '.workflow_runs[] | select(.pull_requests[].number == ${{ github.event.pull_request.number }} and .name != "Rerun PR Checks on Base Change") | .id')
+            --jq '.workflow_runs[] | select(.event == "pull_request" and .head_sha == "${{ github.event.pull_request.head.sha }}") | .id' \
+            | head -n1)
 
-          # Rerun each workflow
-          echo "$runs" | while read run_id; do
+          if [ ! -z "$run_id" ]; then
             echo "Rerunning workflow run $run_id"
             gh api \
               --method POST \
               repos/${{ github.repository }}/actions/runs/$run_id/rerun
-          done
+          else
+            echo "No pull_request workflow run found to rerun"
+          fi
