@@ -11,6 +11,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: "Should fail"
+        id: fail
         shell: bash
         run: |
           sleep 2m
@@ -18,3 +19,5 @@ jobs:
       - name: Should not fail"
         if: always()
         run: |
+          echo "Hi Mom!"
+          echo ${{ steps.fail.conclusion }}
