@@ -1,0 +1,21 @@
+name: "pull request"
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - main
+
+jobs:
+  run_stuff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Should fail"
+        shell: bash
+        timeout-minutes: 1
+        run: |
+          sleep 2m
+          exit 0
+      - name: Should not fail"
+        if: always()
+        run: |
+          echo "Hi Mom!"
