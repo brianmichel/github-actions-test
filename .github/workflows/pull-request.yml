@@ -8,14 +8,13 @@ on:
 jobs:
   run_stuff:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: "Should fail"
         shell: bash
-        timeout-minutes: 1
         run: |
           sleep 2m
           exit 0
       - name: Should not fail"
         if: always()
         run: |
-          echo "Hi Mom!"
