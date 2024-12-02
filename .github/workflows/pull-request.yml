@@ -1,0 +1,23 @@
+name: "pull request"
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - main
+
+jobs:
+  run_stuff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: "Should fail"
+        id: fail
+        shell: bash
+        run: |
+          sleep 2m
+          exit 0
+      - name: Should not fail"
+        if: always()
+        run: |
+          echo "Hi Mom!"
+          echo ${{ steps.fail.conclusion }}
