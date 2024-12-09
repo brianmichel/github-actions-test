@@ -19,6 +19,6 @@ jobs:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh workflow run callable-test-app.yml \
-          -r ${{ github.ref_name }} \
+          -r ${{ github.head_ref }} \
           -f "app=Testing" \
           -f "plan=['test-one', 'test-two', 'test-three']"
