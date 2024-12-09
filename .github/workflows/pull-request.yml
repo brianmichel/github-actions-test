@@ -18,7 +18,4 @@ jobs:
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh workflow run callable-test-app.yml \
-            --ref ${{ github.head_ref }} \
-            --raw-field app=Testing \
-            --raw-field plan='["test-one", "test-two", "test-three"]'
+          gh workflow run callable-test-app.yml --ref ${{ github.head_ref }} --raw-field app=Testing --raw-field plan='["test-one", "test-two", "test-three"]'
