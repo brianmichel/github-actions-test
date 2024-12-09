@@ -1,0 +1,23 @@
+name: "pull request"
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - main
+
+jobs:
+  run_stuff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Say Hi
+        run: |
+          echo "Hi Mom!"
+      - name: Call macOS Test App Workflow
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow callable-test-app.yml \
+          -r ${{ github.ref_name }} \
+          -f "app=Testing" \
+          -f "plan=['test-one', 'test-two']"
