@@ -20,4 +20,4 @@ jobs:
           gh workflow run callable-test-app.yml \
           -r ${{ github.ref_name }} \
           -f "app=Testing" \
-          -f "plan=['test-one', 'test-two']"
+          -f "plan=['test-one', 'test-two', 'test-three']"
