@@ -38,7 +38,7 @@ jobs:
           }
           EOF
           )
-          parsed=$(echo "$DATA" | jq -cs '.')
+          parsed=$(echo "$DATA" | jq -c '.')
           echo "pased output is: $parsed"
           echo "matrix=$parsed" >> $GITHUB_OUTPUT
       - name: Reference script
