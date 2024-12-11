@@ -18,8 +18,7 @@ jobs:
         run: |
           set -o pipefail
           set -x
-
-          read -r -d '' DATA <<"EOM"
+          DATA=$(cat <<EOF
           {
             "name": "BoostBrowserEvals",
             "is-ui": false,
@@ -36,7 +35,8 @@ jobs:
             "xcconfig-override": "Configurations/CI-Overrides-boost-macOS.dev.xcconfig",
             "test-filter-params": ""
           }
-          EOM
+          EOF
+          )
           parsed=$(echo "$DATA" | jq -cs '.')
           echo "pased output is: $parsed"
           echo "matrix=$parsed" >> $GITHUB_OUTPUT
