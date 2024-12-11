@@ -21,6 +21,5 @@ jobs:
           hi
           EOM
           parsed=$(echo $DATA | jq -cs '.')
-          echo "pased output is: $parsed"
-          export THING=$parsed
+          echo "parsed output is: $parsed"
           echo "matrix=$parsed" >> $GITHUB_SUMMARY
