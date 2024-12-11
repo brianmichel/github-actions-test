@@ -14,8 +14,28 @@ jobs:
       - name: Say Hi
         run: |
           echo "Hi Mom!"
-      - name: Call macOS Test App Workflow
-        env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run script
         run: |
-          gh workflow run callable-test-app.yml --ref ${{ github.head_ref }} --raw-field app=Testing --raw-field plan='["test-one", "test-two", "test-three"]'
+          set -o pipefail
+          read -r -d '' DATA << EOM
+          {
+            "name": "BoostBrowserEvals",
+            "is-ui": false,
+            "xcscheme": "BoostBrowserEvals",
+            "testplan": "BoostBrowserEvals",
+            "build-action": "build-for-testing",
+            "build-github-tag-ref": "",
+            "build-additional-params": "-testPlan BoostBrowserEvals",
+            "datadog-service": "boostbrowserevals-unit-tests",
+            "datadog-tag-name": "unit-tests",
+            "requires-eval-snapshots": true,
+            "only-suites": [],
+            "skip-suites": [],
+            "xcconfig-override": "Configurations/CI-Overrides-boost-macOS.dev.xcconfig",
+            "test-filter-params": ""
+          }
+          EOM
+          parsed=$(echo $DATA | jq -cs '.')
+          echo "pased output is: $parsed"
+          export THING=$parsed
+          echo "matrix=$parsed" >> $GITHUB_SUMMARY
