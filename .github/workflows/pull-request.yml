@@ -18,7 +18,8 @@ jobs:
         run: |
           set -o pipefail
           set -x
-          read -r -d '' DATA << 'EOM'
+
+          read -r -d '' DATA <<'EOM'
           {
             "name": "BoostBrowserEvals",
             "is-ui": false,
