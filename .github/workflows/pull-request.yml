@@ -17,6 +17,7 @@ jobs:
       - name: Run script
         run: |
           set -o pipefail
+          set -x
           read -r -d '' DATA << 'EOM'
           {
             "name": "BoostBrowserEvals",
