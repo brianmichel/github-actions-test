@@ -43,4 +43,4 @@ jobs:
           echo "matrix=$parsed" >> $GITHUB_OUTPUT
       - name: Reference script
         run: |
-          echo ${{ steps.script.outputs.datadog-tag-name }}
+          echo ${{ steps.script.outputs.matrix }}
