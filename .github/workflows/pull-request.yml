@@ -15,6 +15,7 @@ jobs:
         run: |
           echo "Hi Mom!"
       - name: Run script
+        id: script
         run: |
           set -o pipefail
           set -x
@@ -40,3 +41,6 @@ jobs:
           parsed=$(echo "$DATA" | jq -cs '.')
           echo "pased output is: $parsed"
           echo "matrix=$parsed" >> $GITHUB_OUTPUT
+      - name: Reference script
+        run: |
+          echo ${{ steps.script.outputs.datadog-tag-name }}
