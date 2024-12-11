@@ -35,7 +35,7 @@ jobs:
             "test-filter-params": ""
           }
           EOM
-          parsed=$(echo $DATA | jq -cs '.')
-          echo "pased output is: $parsed"
-          export THING=$parsed
-          echo "matrix=$parsed" >> $GITHUB_SUMMARY
+          # parsed=$(echo $DATA | jq -cs '.')
+          # echo "pased output is: $parsed"
+          # export THING=$parsed
+          # echo "matrix=$parsed" >> $GITHUB_SUMMARY
