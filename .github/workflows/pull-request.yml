@@ -1,0 +1,46 @@
+name: "pull request"
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - main
+
+jobs:
+  run_stuff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v4.2.1
+      - name: Say Hi
+        run: |
+          echo "Hi Mom!"
+      - name: Run script
+        id: script
+        run: |
+          set -o pipefail
+          set -x
+          DATA=$(cat <<EOF
+          {
+            "name": "BoostBrowserEvals",
+            "is-ui": false,
+            "xcscheme": "BoostBrowserEvals",
+            "testplan": "BoostBrowserEvals",
+            "build-action": "build-for-testing",
+            "build-github-tag-ref": "",
+            "build-additional-params": "-testPlan BoostBrowserEvals",
+            "datadog-service": "boostbrowserevals-unit-tests",
+            "datadog-tag-name": "unit-tests",
+            "requires-eval-snapshots": true,
+            "only-suites": [],
+            "skip-suites": [],
+            "xcconfig-override": "Configurations/CI-Overrides-boost-macOS.dev.xcconfig",
+            "test-filter-params": ""
+          }
+          EOF
+          )
+          parsed=$(echo "$DATA" | jq -c '.')
+          echo "pased output is: $parsed"
+          echo "matrix=$parsed" >> $GITHUB_OUTPUT
+      - name: Reference script
+        run: |
+          echo ${{ format('[{0}]', steps.script.outputs.matrix.datadog-tag-name) }}

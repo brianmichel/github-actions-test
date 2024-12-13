@@ -1,0 +1,24 @@
+name: macOS Test App
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'App to test'
+        required: true
+        type: string
+      plan:
+        description: 'Test plan as JSON to test the app with'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: ${{ fromJSON(inputs.plan) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Debug
+        run: |
+          echo "Testing ${{ inputs.app }} with plan - ${{ matrix.config }}"
