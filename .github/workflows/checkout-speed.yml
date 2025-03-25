@@ -17,7 +17,7 @@ jobs:
           echo "Starting raw git checkout measurement..."
           start_time=$(date +%s.%N)
 
-          git clone --depth=1 --no-checkout --progress=false https://github.com/swiftlang/llvm-project.git
+          git clone --depth=1 --no-checkout --progress https://github.com/swiftlang/llvm-project.git
           git -C llvm-project checkout HEAD
 
           end_time=$(date +%s.%N)
