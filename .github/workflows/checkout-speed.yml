@@ -6,8 +6,10 @@ on:
 jobs:
   measure-checkout:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -26,13 +28,13 @@ jobs:
 
           Write-Host "Raw git checkout completed in ${duration} seconds"
           echo "duration=$duration" >> $env:GITHUB_OUTPUT
-
-      - name: Measure actions/checkout time
-        id: actions-checkout
+      - name: Record start time
+        id: start-time
         shell: pwsh
         run: |
           Write-Host "Starting actions/checkout measurement..."
           $start_time = Get-Date
+          echo "timestamp=$($start_time.ToString('o'))" >> $env:GITHUB_OUTPUT
 
       - name: Perform actions/checkout
         uses: actions/checkout@v4.2.2
@@ -46,6 +48,7 @@ jobs:
         shell: pwsh
         run: |
           $end_time = Get-Date
+          $start_time = [DateTime]::Parse('${{ steps.start-time.outputs.timestamp }}')
           $duration = ($end_time - $start_time).TotalSeconds
 
           Write-Host "actions/checkout completed in ${duration} seconds"
