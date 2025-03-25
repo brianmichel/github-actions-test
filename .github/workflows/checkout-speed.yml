@@ -11,13 +11,15 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Measure raw git checkout time
-        id: raw-git
+      - name: Measure raw git checkout time (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        id: raw-git-ubuntu
+        shell: bash
         run: |
           echo "Starting raw git checkout measurement..."
           start_time=$(date +%s.%N)
 
-          git clone --depth=1 --no-checkout --progress https://github.com/swiftlang/llvm-project.git
+          git clone --depth=1 --no-checkout --progress=false https://github.com/swiftlang/llvm-project.git
           git -C llvm-project checkout HEAD
 
           end_time=$(date +%s.%N)
@@ -26,9 +28,28 @@ jobs:
           echo "Raw git checkout completed in ${duration} seconds"
           echo "duration=$duration" >> $GITHUB_OUTPUT
 
-      - name: Create Raw Git Sparkline
+      - name: Measure raw git checkout time (Windows)
+        if: matrix.os == 'windows-latest'
+        id: raw-git-windows
+        shell: pwsh
         run: |
-          duration=${{ steps.raw-git.outputs.duration }}
+          Write-Host "Starting raw git checkout measurement..."
+          $start_time = Get-Date
+
+          git clone --depth=1 --no-checkout --progress=false https://github.com/swiftlang/llvm-project.git
+          git -C llvm-project checkout HEAD
+
+          $end_time = Get-Date
+          $duration = ($end_time - $start_time).TotalSeconds
+
+          Write-Host "Raw git checkout completed in ${duration} seconds"
+          echo "duration=$duration" >> $env:GITHUB_OUTPUT
+
+      - name: Create Raw Git Sparkline (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          duration=${{ steps.raw-git-ubuntu.outputs.duration }}
           scaled_duration=$(echo "$duration * 10" | bc | cut -d. -f1)
           sparkline=""
 
@@ -39,11 +60,32 @@ jobs:
           echo "Raw Git Checkout Speed Sparkline: $sparkline"
           echo "Raw Git Duration: ${duration}s"
 
-      - name: Measure actions/checkout time
-        id: actions-checkout
+      - name: Create Raw Git Sparkline (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $duration = ${{ steps.raw-git-windows.outputs.duration }}
+          $scaled_duration = [math]::Floor($duration * 10)
+          $sparkline = "▁" * $scaled_duration
+
+          Write-Host "Raw Git Checkout Speed Sparkline: $sparkline"
+          Write-Host "Raw Git Duration: ${duration}s"
+
+      - name: Measure actions/checkout time (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        id: actions-checkout-ubuntu
+        shell: bash
         run: |
           echo "Starting actions/checkout measurement..."
           start_time=$(date +%s.%N)
+
+      - name: Measure actions/checkout time (Windows)
+        if: matrix.os == 'windows-latest'
+        id: actions-checkout-windows
+        shell: pwsh
+        run: |
+          Write-Host "Starting actions/checkout measurement..."
+          $start_time = Get-Date
 
       - name: Perform actions/checkout
         uses: actions/checkout@v4
@@ -52,8 +94,10 @@ jobs:
           fetch-depth: 1
           show-progress: false
 
-      - name: Calculate actions/checkout duration
-        id: actions-checkout-duration
+      - name: Calculate actions/checkout duration (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        id: actions-checkout-duration-ubuntu
+        shell: bash
         run: |
           end_time=$(date +%s.%N)
           duration=$(echo "$end_time - $start_time" | bc)
@@ -61,9 +105,22 @@ jobs:
           echo "actions/checkout completed in ${duration} seconds"
           echo "duration=$duration" >> $GITHUB_OUTPUT
 
-      - name: Create Actions Checkout Sparkline
+      - name: Calculate actions/checkout duration (Windows)
+        if: matrix.os == 'windows-latest'
+        id: actions-checkout-duration-windows
+        shell: pwsh
         run: |
-          duration=${{ steps.actions-checkout-duration.outputs.duration }}
+          $end_time = Get-Date
+          $duration = ($end_time - $start_time).TotalSeconds
+
+          Write-Host "actions/checkout completed in ${duration} seconds"
+          echo "duration=$duration" >> $env:GITHUB_OUTPUT
+
+      - name: Create Actions Checkout Sparkline (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          duration=${{ steps.actions-checkout-duration-ubuntu.outputs.duration }}
           scaled_duration=$(echo "$duration * 10" | bc | cut -d. -f1)
           sparkline=""
 
@@ -73,3 +130,14 @@ jobs:
 
           echo "Actions Checkout Speed Sparkline: $sparkline"
           echo "Actions Checkout Duration: ${duration}s"
+
+      - name: Create Actions Checkout Sparkline (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $duration = ${{ steps.actions-checkout-duration-windows.outputs.duration }}
+          $scaled_duration = [math]::Floor($duration * 10)
+          $sparkline = "▁" * $scaled_duration
+
+          Write-Host "Actions Checkout Speed Sparkline: $sparkline"
+          Write-Host "Actions Checkout Duration: ${duration}s"
